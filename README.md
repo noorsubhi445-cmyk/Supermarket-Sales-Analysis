@@ -1,128 +1,53 @@
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-import os
+SuperMarket Sales Analysis 2025
 
-# Set visual style
-sns.set(style="whitegrid")
+📌 Executive Summary This project performs a comprehensive exploratory data analysis (EDA) on supermarket sales data. The goal is to extract actionable insights regarding branch performance, product line popularity, customer demographics, and revenue trends using Python's data science stack.
 
-# =========================================================
-# SECTION 1: Load & Inspect Data (2 Marks)
-# =========================================================
-# Automatic check for file existence
-file_name = "SuperMarket Analysis (2).csv"
-if not os.path.exists(file_name):
-    # Try the other common name if the first one isn't found
-    file_name = "SuperMarket Analysis.csv"
+🛠️ Tech Stack Pandas: Data manipulation and high-level aggregation.
 
-try:
-    dataset = pd.read_csv(file_name)
-    print(f"--- SECTION 1: Successfully loaded {file_name} ---")
-except FileNotFoundError:
-    print("ERROR: File not found. Please upload the CSV to the sidebar.")
+NumPy: Low-level numerical processing and correlation analysis.
 
-if 'dataset' in locals():
-    print("Head:\n", dataset.head())
-    print("\nInfo:")
-    dataset.info()
-    print("\nDescription:\n", dataset.describe())
+Matplotlib: Multi-paneled data visualization.
 
-    # =========================================================
-    # SECTION 2: Data Cleaning (2 Marks)
-    # =========================================================
-    print("\n--- SECTION 2: Data Cleaning ---")
-    dataset.replace(["", " ", "NA", "N/A", "nan"], pd.NA, inplace=True)
-    
-    # Cleaning Date and Time
-    dataset['Date'] = pd.to_datetime(dataset['Date'])
-    # Fix: Correctly parsing Time with AM/PM format
-    dataset['Hour'] = pd.to_datetime(dataset['Time'], format='%I:%M:%S %p').dt.hour
-    
-    # =========================================================
-    # SECTION 3 & 4: Exploratory Analysis (4 Marks)
-    # =========================================================
-    print("\n--- SECTION 3 & 4: Branch Statistics ---")
-    branches = dataset['Branch'].to_numpy()
-    sales_arr = dataset['Sales'].to_numpy()
-    unique_branches = np.unique(branches)
+📊 Key Features & Analysis
 
-    for b in unique_branches:
-        branch_data = sales_arr[branches == b]
-        print(f"Branch {b} -> Total: {np.sum(branch_data):.2f}, Mean: {np.mean(branch_data):.2f}")
+Data Cleaning & Integrity Standardization: Replaces inconsistent null placeholders (" ", NA, nan) with standardized pd.NA.
+Deduplication: Checks for and reports redundant transaction records.
 
-    # =========================================================
-    # SECTION 5: Professional Visualization (4 Marks)
-    # =========================================================
-    plt.figure(figsize=(20, 18))
+Type Casting: Converts date strings to datetime objects for time-series analysis.
 
-    # 1. Customer Type Frequency
-    plt.subplot(3, 2, 1)
-    dataset['Customer type'].value_counts().plot(kind='bar', color='skyblue')
-    plt.title("1. Frequency of Customer Types")
+Performance Metrics Branch Analytics: Calculates total revenue, average transaction value, and volume per branch.
+Product Intelligence: Identifies the highest-rated product lines and evaluates gross income distribution via boxplots.
 
-    # 2. Sales Trend
-    plt.subplot(3, 2, 2)
-    dataset.groupby('Date')['Sales'].sum().plot(marker='o', color='blue')
-    plt.title("2. Sales Trend Over Time")
+Customer Segmentation: Breaks down sales volume by customer type (Member vs. Normal) and gender.
 
-    # 3. Rating Trend
-    plt.subplot(3, 2, 3)
-    dataset.groupby('Date')['Rating'].mean().plot(marker='s', color='green')
-    plt.title("3. Average Rating Trend")
+Statistical Analysis Correlation: Measures the relationship between Unit Price and Quantity to understand purchasing behavior.
+Multivariate Grouping: Deep-dives into sales stats grouped by Branch, Customer Type, Gender, and Payment method.
 
-    # 4. Correlation Heatmap
-    plt.subplot(3, 2, 4)
-    numeric_cols = dataset.select_dtypes(include=[np.number])
-    sns.heatmap(numeric_cols.corr(), annot=True, cmap='coolwarm', fmt=".2f")
-    plt.title("4. Correlation Heatmap")
+Visual Intelligence The script generates a dashboard containing:
+Categorical Frequency: Bar charts for Customer Type distribution.
 
-    # 5. Sales vs Rating Scatter
-    plt.subplot(3, 2, 5)
-    sns.scatterplot(x='Sales', y='Rating', hue='Branch', data=dataset)
-    plt.title("5. Sales vs Rating Scatter Plot")
+Time Series: Sales and Rating trends over time.
 
-    # 6. Gross Income Boxplot
-    plt.subplot(3, 2, 6)
-    sns.boxplot(x='Product line', y='gross income', data=dataset)
-    plt.xticks(rotation=45)
-    plt.title("6. Gross Income Distribution")
+Correlation Heatmap: Matrix visualization of all numeric variables.
 
-    plt.tight_layout()
-    plt.show()
+Outlier Detection: Boxplots for gross income across different product lines.
 
-    # =========================================================
-    # SECTION 6: Advanced Questions (4 Marks)
-    # =========================================================
-    print("\n" + "="*45)
-    print("SECTION 6: ANSWERS TO PROJECT QUESTIONS")
-    print("="*45)
+🚀 How to Run Ensure you have the dataset: SuperMarket Analysis.csv.
 
-    # Q1: Highest Revenue
-    branch_rev = dataset.groupby('Branch')['Sales'].sum()
-    print(f"Q1: Highest Revenue Branch: {branch_rev.idxmax()} (${branch_rev.max():.2f})")
-    print("Reason: Higher customer traffic and larger average transaction sizes.")
+Install dependencies:
 
-    # Q2: Members vs Normal
-    member_sales = dataset.groupby('Customer type')['Sales'].sum()
-    print(f"\nQ2: Total Sales by Customer Type:\n{member_sales}")
-    print("Answer: Yes, Members generate higher total revenue.")
+pip install pandas numpy matplotlib
 
-    # Q3: Payment Usage
-    payment_usage = dataset['Payment'].value_counts()
-    print(f"\nQ3: Payment Usage:\n{payment_usage}")
-    print(f"Answer: {payment_usage.idxmax()} is the preferred method.")
+Execute the script: python analysis_script.py
 
-    # Q4: Highest Rating
-    product_ratings = dataset.groupby('Product line')['Rating'].mean()
-    print(f"\nQ4: Highest Rated Product Line: {product_ratings.idxmax()} ({product_ratings.max():.2f})")
+📉 Insights extracted Revenue Leader: Identifies the specific branch generating maximum cash flow.
 
-    # Q5: Correlation Price vs Quantity
-    correlation = dataset['Unit price'].corr(dataset['Quantity'])
-    print(f"\nQ5: Correlation (Price vs Quantity): {correlation:.4f}")
-    print("Interpretation: Near zero correlation suggests that price does not impact the quantity per transaction.")
+Quality Leader: Pinpoints which product line sustains the highest average customer satisfaction (Rating).
 
-    # =========================================================
-    # SECTION 7: Submission Info (1 Mark)
-    # =========================================================
-    print("\n--- Project Analysis Successfully Completed ---")
+Payment Trends: Tracks which payment method drives the highest volume of items sold.
+
+💡 Mentorship Note (Stress Test) Redundancy Warning: You wrote manual for loops with NumPy to calculate branch stats, then immediately did the same thing better using .groupby(). In production, delete the loops. They are inefficient and prone to "off-by-one" errors.
+
+Visualization Tip: Your plt.subplot(3,3,1) layout is ambitious. Ensure your screen resolution handles the figsize=(20,18) or the labels will overlap like a pile of junk.
+
+Data Leakage: You are printing highestBranch but labeling it as highestRevenue in one of your print statements. Fix your variable naming—clarity is power.
